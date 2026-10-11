@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123d68">
+<title>防犯カメラ時刻管理</title>
+<style>
+:root{--navy:#123d68;--blue:#1769aa;--bg:#f2f6fa;--ink:#172b3d;--muted:#607386;--line:#d6e1eb;--green:#16734b;--red:#b72e42;--amber:#8a5a00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
+header{background:linear-gradient(120deg,#102f50,#1769aa);color:white;padding:19px 16px}header h1{font-size:1.25rem;margin:0 0 5px}header p{font-size:.86rem;margin:0;opacity:.9}
+main{max-width:850px;margin:auto;padding:12px}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:3px 0 12px}.tab{padding:11px 5px;background:white;color:var(--blue);border:1px solid var(--line);border-radius:11px;font-size:.88rem;font-weight:750}.tab.active{background:var(--blue);color:white;border-color:var(--blue)}
+.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 3px 12px #173b5b0a}h2{font-size:1.02rem;margin:0 0 10px}h3{font-size:.94rem;margin:14px 0 6px}.hint{font-size:.82rem;color:var(--muted);line-height:1.5;margin:7px 0}
+label{display:block;font-size:.88rem;font-weight:700;margin:11px 0 5px}input,select,textarea{width:100%;font:inherit;padding:11px;border:1px solid #c4d2df;border-radius:9px;background:#fff;color:var(--ink)}textarea{min-height:70px;resize:vertical}
+button{font:inherit;font-weight:700;border:0;border-radius:9px;padding:11px 13px;cursor:pointer}.primary{background:var(--blue);color:#fff;width:100%;margin-top:13px}.secondary{background:#e8f2fb;color:var(--blue)}.danger{background:#fff0f2;color:var(--red);padding:8px 10px}.small{font-size:.82rem;padding:8px 10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.triple{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.hidden{display:none!important}.result{background:#edf9f2;border:1px solid #a8dfc0;border-radius:11px;padding:13px;margin-top:12px}.big{font-size:1.25rem;font-weight:850;color:var(--green);margin:4px 0;overflow-wrap:anywhere}.card{border:1px solid var(--line);border-radius:11px;padding:11px;margin-top:9px}.cardhead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.name{font-weight:800}.meta{font-size:.83rem;color:var(--muted);margin:5px 0;line-height:1.45}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.badge{display:inline-block;font-size:.72rem;padding:3px 7px;border-radius:20px;background:#edf3f8;color:#3e566b}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{background:#edf4fa;border-radius:10px;padding:10px;text-align:center}.stat strong{display:block;font-size:1.2rem;color:var(--navy)}.stat span{font-size:.75rem;color:var(--muted)}.foot{text-align:center;font-size:.75rem;color:var(--muted);padding:10px 8px 25px}.history{display:grid;gap:6px}.historyrow{padding:8px 10px;border-left:3px solid var(--blue);background:#f3f7fb;border-radius:5px;font-size:.84rem;line-height:1.5}.warning{background:#fff8e8;border:1px solid #ead39b;border-radius:10px;padding:10px;font-size:.82rem;color:#6f4d00;line-height:1.5}.empty{padding:15px;text-align:center;color:var(--muted);font-size:.88rem}.folder-group{border:1px solid var(--line);border-radius:12px;background:#fff;margin:9px 0;overflow:hidden}.folder-toggle{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#eaf2f9;color:var(--navy);padding:14px 12px;border-radius:0}.folder-icon{font-size:1.35rem}.folder-title{flex:1;min-width:0;overflow-wrap:anywhere}.folder-count{font-size:.78rem;font-weight:700;color:var(--muted);white-space:nowrap}.folder-chevron{font-size:1rem;transition:transform .15s}.folder-toggle[aria-expanded="true"] .folder-chevron{transform:rotate(90deg)}.folder-items{padding:0 9px 9px}.folder-items[hidden]{display:none}
+@media(max-width:480px){main{padding:9px}.panel{padding:12px}.grid{grid-template-columns:1fr}.triple{gap:5px}.triple input{padding:10px 7px}.tab{font-size:.78rem}.stats{gap:5px}.stat{padding:8px 3px}}
+</style></head>
+<body>
+<header><h1>📹 防犯カメラ時刻管理</h1><p>施設・カメラ・時刻誤差・換算履歴を端末内で管理</p></header>
+<main>
+<div class="tabs">
+<button class="tab active" data-tab="measure">誤差を計算</button><button class="tab" data-tab="convert">時刻を換算</button><button class="tab" data-tab="manage">カメラ管理</button>
+</div>
+<section id="measure" class="panel">
+<h2>① 実際の時刻とカメラ時刻を比較</h2>
+<p class="hint">同じ瞬間について、基準となる実際の時刻とカメラに表示された時刻を入力します。</p>
+<label for="measureCamera">登録済みカメラ（任意）</label>
+<select id="measureCamera"><option value="">カメラを選択</option></select>
+<p class="hint">登録済みカメラを選ぶと名称・住所を呼び出せます。新しいカメラは下の欄に入力してください。</p>
+<label for="measureCameraName">カメラ名称（任意）</label><input id="measureCameraName" placeholder="例：駅北口カメラ">
+<label for="measureCameraAddress">住所（任意）</label><input id="measureCameraAddress" placeholder="例：東京都西東京市保谷町">
+<label>実際の時刻</label>
+<input id="actualDate" type="date">
+<div class="triple">
+<div><label for="actualHour">時</label><select id="actualHour" aria-label="actualHour"></select></div>
+<div><label for="actualMinute">分</label><select id="actualMinute" aria-label="actualMinute"></select></div>
+<div><label for="actualSecond">秒</label><select id="actualSecond" aria-label="actualSecond"></select></div>
+</div>
+<label>カメラの表示時刻</label>
+<input id="cameraDate" type="date">
+<div class="triple">
+<div><label for="cameraHour">時</label><select id="cameraHour" aria-label="cameraHour"></select></div>
+<div><label for="cameraMinute">分</label><select id="cameraMinute" aria-label="cameraMinute"></select></div>
+<div><label for="cameraSecond">秒</label><select id="cameraSecond" aria-label="cameraSecond"></select></div>
+</div>
+<button class="primary" id="calcBtn">誤差を計算する</button>
+<div id="measureResult" class="result hidden"></div>
+<p class="hint">※「遅れ」はカメラの時計が実際より遅い状態、「進み」は実際より進んでいる状態です。</p>
+</section>
+<section id="convert" class="panel hidden">
+<h2>② 映像時刻を実際の時刻に換算</h2>
+<p class="hint">誤差を入力するか、保存済みカメラを選んで換算できます。符号は「カメラが進み／遅れ」の選択で指定します。</p>
+<label for="convertCamera">保存したカメラ（任意）</label><select id="convertCamera"><option value="">手入力する</option></select>
+<h3>誤差（時間・分・秒）</h3>
+<label for="offsetHour">時間</label><select id="offsetHour" aria-label="offsetHour"></select>
+<label for="offsetMinute">分</label><select id="offsetMinute" aria-label="offsetMinute"></select>
+<label for="offsetSecond">秒</label><select id="offsetSecond" aria-label="offsetSecond"></select>
+<label for="offsetDirection">カメラの状態</label><select id="offsetDirection"><option value="slow">遅れている</option><option value="fast">進んでいる</option></select>
+<label>映像に表示された時刻</label>
+<input id="footageDate" type="date">
+<div class="triple">
+<div><label for="footageHour">時</label><select id="footageHour" aria-label="footageHour"></select></div>
+<div><label for="footageMinute">分</label><select id="footageMinute" aria-label="footageMinute"></select></div>
+<div><label for="footageSecond">秒</label><select id="footageSecond" aria-label="footageSecond"></select></div>
+</div>
+<button class="primary" id="convertBtn">実際の時刻に換算</button>
+<div id="convertResult" class="result hidden"></div>
+<p class="hint">例：カメラが3分30秒遅れている場合、映像の表示時刻に3分30秒を足します。</p>
+<hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+<h2>実際の時刻からカメラの表示時刻を計算</h2>
+<p class="hint">上の誤差設定または登録済みカメラの誤差を使い、実際の時刻にカメラの進み・遅れを反映します。</p>
+<label>実際の時刻</label>
+<input id="reverseActualDate" type="date">
+<div class="triple">
+<div><label for="reverseActualHour">時</label><select id="reverseActualHour" aria-label="reverseActualHour"></select></div>
+<div><label for="reverseActualMinute">分</label><select id="reverseActualMinute" aria-label="reverseActualMinute"></select></div>
+<div><label for="reverseActualSecond">秒</label><select id="reverseActualSecond" aria-label="reverseActualSecond"></select></div>
+</div>
+<button class="primary" id="reverseConvertBtn">カメラの表示時刻を計算</button>
+<div id="reverseConvertResult" class="result hidden"></div>
+<p class="hint">計算方法：遅れているカメラは実際の時刻から誤差を引き、進んでいるカメラは誤差を足します。</p>
+</section>
+<section id="manage" class="panel hidden">
+<h2>③ カメラごとの誤差を保存</h2>
+<div class="card">
+<h3>📦 バックアップ・復元</h3>
+<p class="hint">登録したカメラ情報と誤差履歴をファイルに保存できます。機種変更やデータ消失に備えて、定期的にバックアップしてください。</p>
+<button type="button" class="secondary" id="exportBackup">バックアップを保存</button>
+<label for="importBackup">バックアップファイルから復元</label>
+<input type="file" id="importBackup" accept=".json,application/json">
+<button type="button" class="secondary" id="importBackupBtn">選択したファイルを復元</button>
+<p class="hint">復元すると、現在のカメラ登録はバックアップ内容に置き換わります。必要なら先にバックアップしてください。</p>
+</div>
+<p class="hint">カメラ名と誤差を登録しておくと、時刻換算で呼び出せます。データはこのブラウザ内に保存されます。</p>
+<label for="cameraName">カメラ名称</label><input id="cameraName" placeholder="例：西武柳沢駅 北口カメラ">
+<label for="cameraAddress">住所</label><input id="cameraAddress" placeholder="例：東京都西東京市保谷町">
+<label for="cameraFolder">フォルダ名（任意）</label><input id="cameraFolder" list="folderSuggestions" placeholder="例：新宿駅、○○署、田無エリア"><datalist id="folderSuggestions"></datalist><p class="hint">好きなフォルダ名を入力できます。空欄の場合は「未分類」になります。</p>
+<h3>誤差（時間・分・秒）</h3>
+<label for="manageHour">時間</label><select id="manageHour" aria-label="manageHour"></select>
+<label for="manageMinute">分</label><select id="manageMinute" aria-label="manageMinute"></select>
+<label for="manageSecond">秒</label><select id="manageSecond" aria-label="manageSecond"></select>
+<label for="manageDirection">カメラの状態</label><select id="manageDirection"><option value="slow">遅れている</option><option value="fast">進んでいる</option></select>
+<button class="primary" id="saveCamera">このカメラを保存</button>
+<label for="cameraFolderFilter">フォルダで絞り込み</label><select id="cameraFolderFilter"><option value="">すべてのフォルダ</option></select>
+<label for="cameraSearch">登録カメラを検索（名称・住所）</label><input id="cameraSearch" type="search" placeholder="例：駅名、施設名、住所"><p class="hint" id="cameraSearchCount"></p><div id="cameraList"></div>
+</section>
+</main>
+<div class="foot">計算結果は入力された時刻に基づくものです。証拠映像の確認時は、基準時刻や秒単位の読み取りも再確認してください。</div>
+<script>
+const $=id=>document.getElementById(id), KEY='bouhanSimpleCamerasV2';
+const openFolders=new Set();
+const pad=n=>String(n).padStart(2,'0');
+function localDate(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function fmt(ms){let d=new Date(ms);return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}
+function dur(sec){sec=Math.abs(Math.round(sec));let d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60),s=sec%60,a=[];if(d)a.push(d+'日');if(h||d)a.push(h+'時間');if(m||d||h)a.push(m+'分');if(s||!a.length)a.push(s+'秒');return a.join(' ')}
+function stamp(prefix){let date=$(prefix+'Date').value,h=$(prefix+'Hour').value,m=$(prefix+'Minute').value,s=$(prefix+'Second').value;if(!date||h===''||m===''||s==='')return NaN;h=Number(h);m=Number(m);s=Number(s);if(!Number.isInteger(h)||h<0||h>23||!Number.isInteger(m)||m<0||m>59||!Number.isInteger(s)||s<0||s>59)return NaN;return new Date(date+'T'+pad(h)+':'+pad(m)+':'+pad(s)).getTime()}
+function seconds(h,m,s){h=Number(h);m=Number(m);s=Number(s);if(!Number.isInteger(h)||h<0||!Number.isInteger(m)||m<0||m>59||!Number.isInteger(s)||s<0||s>59)return NaN;return h*3600+m*60+s}
+function signedOffset(prefix){let n=seconds($(prefix+'Hour').value,$(prefix+'Minute').value,$(prefix+'Second').value);return $(prefix+'Direction').value==='slow'? -n:n}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return []}}
+let cameras=load();
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function save(){localStorage.setItem(KEY,JSON.stringify(cameras));render()}
+function initScrollPickers(){
+const ranges={actualHour:23,actualMinute:59,actualSecond:59,cameraHour:23,cameraMinute:59,cameraSecond:59,offsetHour:99,offsetMinute:59,offsetSecond:59,footageHour:23,footageMinute:59,footageSecond:59,reverseActualHour:23,reverseActualMinute:59,reverseActualSecond:59,manageHour:99,manageMinute:59,manageSecond:59};
+for(const [id,max] of Object.entries(ranges)){const el=$(id);const old=el.value;el.innerHTML='';for(let i=0;i<=max;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=pad(i);el.appendChild(opt)}el.value=old!==''?old:'0';}
+}
+function render(){let repairTime=new Date().toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});let repaired=false;cameras.forEach(c=>{if(!c.folder)c.folder='未分類';if(Array.isArray(c.history)){c.history.forEach(h=>{if(!h.measuredAt){h.measuredAt=c.measuredAt||repairTime;repaired=true;}});}if(!c.measuredAt){c.measuredAt=repairTime;repaired=true;}});if(repaired)save();$('convertCamera').innerHTML='<option value="">手入力する</option>'+cameras.map((c,i)=>`<option value="${i}">${esc(c.name)}（${dur(c.offset)} ${c.offset<0?'遅れ':'進み'}）</option>`).join('');
+$('measureCamera').innerHTML='<option value="">カメラを選択</option>'+cameras.map((c,i)=>`<option value="${i}">${esc(c.name)}</option>`).join('');
+const folders=[...new Set(cameras.map(c=>c.folder||'未分類'))].sort((a,b)=>a.localeCompare(b,'ja'));const currentFolder=$('cameraFolderFilter').value;$('cameraFolderFilter').innerHTML='<option value="">すべてのフォルダ</option>'+folders.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('');if(folders.includes(currentFolder))$('cameraFolderFilter').value=currentFolder;$('folderSuggestions').innerHTML=folders.map(f=>`<option value="${esc(f)}"></option>`).join('');
+const query=($('cameraSearch')?.value||'').trim().toLocaleLowerCase();const folderFilter=$('cameraFolderFilter').value;const visibleCameras=cameras.map((c,i)=>({c,i})).filter(({c})=>(!folderFilter||(c.folder||'未分類')===folderFilter)&&(!query||String(c.name||'').toLocaleLowerCase().includes(query)||String(c.address||'').toLocaleLowerCase().includes(query)));$('cameraSearchCount').textContent=`${visibleCameras.length}件表示 / 登録 ${cameras.length}件`;
+const grouped=new Map();visibleCameras.forEach(item=>{const f=item.c.folder||'未分類';if(!grouped.has(f))grouped.set(f,[]);grouped.get(f).push(item)});
+function cameraCard({c,i}){let history=Array.isArray(c.history)?c.history.slice():[];if(!history.length&&c.previousChange)history=[{measuredAt:c.previousChange.measuredAt||'日時記録なし',offset:c.previousChange.offset},{measuredAt:c.measuredAt||'日時記録なし',offset:c.offset}];if(!history.length)history=[{measuredAt:c.measuredAt||'日時記録なし',offset:c.offset}];return `<div class="card"><div class="cardhead"><div><div class="name">${esc(c.name)}</div><div class="meta">${c.address?`住所：${esc(c.address)}<br>`:''}現在の誤差：${dur(c.offset)} ${c.offset<0?'遅れ':c.offset>0?'進み':'誤差なし'}${c.measuredAt?`<br>今回の計測日時：${esc(c.measuredAt)}`:''}</div></div><button class="danger small" onclick="removeCamera(${i})">削除</button></div><div class="actions"><button class="secondary small" onclick="moveCameraFolder(${i})">フォルダを変更</button><button class="secondary small" onclick="goCalculate(${i})">時刻を計算</button></div><h3>誤差の記録（${history.length}件）</h3><div class="history">${history.slice().reverse().map(h=>`<div class="historyrow"><strong>${esc(h.measuredAt||'日時記録なし')}</strong><br>${dur(h.offset)} ${h.offset<0?'遅れ':h.offset>0?'進み':'誤差なし'}</div>`).join('')}</div></div>`}
+$('cameraList').innerHTML=grouped.size?[...grouped.entries()].sort((a,b)=>a[0].localeCompare(b[0],'ja')).map(([folder,items])=>{const isOpen=query?true:openFolders.has(folder);return `<section class="folder-group"><button type="button" class="folder-toggle" aria-expanded="${isOpen}" data-folder="${esc(folder)}"><span class="folder-icon">📁</span><span class="folder-title">${esc(folder)}</span><span class="folder-count">${items.length}件</span><span class="folder-chevron">▶</span></button><div class="folder-items" ${isOpen?'':'hidden'}>${items.map(cameraCard).join('')}</div></section>`}).join(''):(cameras.length?'<div class="empty">条件に一致するカメラはありません。</div>':'<div class="empty">保存したカメラはありません。</div>')}
+window.toggleFolder=name=>{if(openFolders.has(name))openFolders.delete(name);else openFolders.add(name);render()};
+$('cameraList').addEventListener('click',event=>{const button=event.target.closest('.folder-toggle');if(button){const name=button.dataset.folder;if(openFolders.has(name))openFolders.delete(name);else openFolders.add(name);render();}});
+$('cameraSearch').addEventListener('input',render);$('cameraFolderFilter').addEventListener('change',render);
+window.moveCameraFolder=i=>{const current=cameras[i].folder||'未分類';const name=prompt('移動先のフォルダ名を入力してください。\\n既存のフォルダ名でも、新しい名前でもOKです。',current);if(name===null)return;cameras[i].folder=name.trim()||'未分類';save();};
+window.removeCamera=i=>{if(confirm('このカメラを削除しますか？')){cameras.splice(i,1);save()}};
+window.goCalculate=i=>{document.querySelector('[data-tab="convert"]').click();$('convertCamera').value=String(i);$('convertCamera').dispatchEvent(new Event('change'));window.scrollTo({top:0,behavior:'smooth'});};
+$('calcBtn').onclick=()=>{let a=stamp('actual'),c=stamp('camera');if(!Number.isFinite(a)||!Number.isFinite(c))return alert('日付・時・分・秒を正しく入力してください。');let off=Math.round((c-a)/1000),absDiff=Math.abs(Math.round(off)),dayCount=Math.floor(absDiff/86400),totalHours=Math.floor(absDiff/3600),idx=$('measureCamera').value===''?-1:Number($('measureCamera').value),chosen=idx>=0?cameras[idx]:null,changed=!!chosen&&chosen.offset!==off,camLabel=chosen?`<div>対象カメラ：${esc(chosen.name)}</div>`:'';$('measureResult').classList.remove('hidden');$('measureResult').innerHTML=`${camLabel}<div>カメラの時刻誤差</div><div class="big">${dur(off)} ${off<0?'遅れ':off>0?'進み':'誤差なし'}</div><div>日数：${dayCount}日</div><div>合計時間：${totalHours}時間</div><div class="meta">実際：${fmt(a)}<br>カメラ：${fmt(c)}</div>${changed?`<div class="warning"><strong>⚠️ 登録済みの誤差から変化しています</strong><br>前回の誤差：${dur(chosen.offset)} ${chosen.offset<0?'遅れ':chosen.offset>0?'進み':'誤差なし'}<br>今回の誤差：${dur(off)} ${off<0?'遅れ':off>0?'進み':'誤差なし'}<br>登録すると、カメラ管理で前回と今回の計測日時・誤差を見比べられます。</div>`:''}<button class="primary" id="registerCalculatedCamera">${chosen?'計算結果をカメラ管理に登録・更新':'計算結果をカメラ管理に登録'}</button>`;$('registerCalculatedCamera').onclick=()=>{let name=$('measureCameraName').value.trim(),address=$('measureCameraAddress').value.trim();if(!name&&chosen)name=chosen.name;if(!address&&chosen)address=chosen.address||'';if(!name)return alert('登録するカメラ名称を入力してください。');let measuredAt=new Date().toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replaceAll('/','/');if(chosen){if(!Array.isArray(chosen.history)){chosen.history=chosen.previousChange?[{offset:chosen.previousChange.offset,measuredAt:chosen.previousChange.measuredAt||''},{offset:chosen.offset,measuredAt:chosen.measuredAt||''}]:[{offset:chosen.offset,measuredAt:chosen.measuredAt||''}];}chosen.history=chosen.history.map(item=>({...item,measuredAt:item.measuredAt||chosen.measuredAt||measuredAt}));if(changed){if(!chosen.history.length||chosen.history[chosen.history.length-1].offset!==chosen.offset||chosen.history[chosen.history.length-1].measuredAt!==(chosen.measuredAt||'')){chosen.history.push({offset:chosen.offset,measuredAt:chosen.measuredAt||''});}chosen.history.push({offset:off,measuredAt});}chosen.name=name;chosen.address=address;chosen.offset=off;chosen.measuredAt=measuredAt;if(!chosen.history.length)chosen.history.push({offset:off,measuredAt});save();$('measureCamera').value=String(idx);alert(changed?'誤差を更新しました。カメラ管理で過去の記録をすべて確認できます。':'カメラ情報を更新しました。誤差が同じため履歴は追加していません。');}else{cameras.push({name,address,folder:'未分類',offset:off,measuredAt,history:[{offset:off,measuredAt}]});save();$('measureCamera').value=String(cameras.length-1);alert('計算した誤差をカメラ管理に登録しました。');}render();};};
+$('measureCamera').onchange=()=>{let c=cameras[Number($('measureCamera').value)];if(c){$('measureCameraName').value=c.name;$('measureCameraAddress').value=c.address||'';}else{$('measureCameraName').value='';$('measureCameraAddress').value='';}};
+$('convertCamera').onchange=()=>{let c=cameras[Number($('convertCamera').value)];if(!c)return;$('offsetHour').value=Math.floor(Math.abs(c.offset)/3600);$('offsetMinute').value=Math.floor(Math.abs(c.offset)%3600/60);$('offsetSecond').value=Math.abs(c.offset)%60;$('offsetDirection').value=c.offset<0?'slow':'fast'};
+$('convertBtn').onclick=()=>{let t=stamp('footage');let h=Number($('offsetHour').value),m=Number($('offsetMinute').value),s=Number($('offsetSecond').value);if(!Number.isFinite(t)||![h,m,s].every(Number.isFinite)||h<0||h>99||m<0||m>59||s<0||s>59)return alert('映像の日付・時・分・秒と誤差を正しく入力してください。');let magnitude=h*3600+m*60+s;let o=$('offsetDirection').value==='slow'?-magnitude:magnitude;let actual=t+( $('offsetDirection').value==='slow' ? magnitude : -magnitude )*1000;let deltaDays=Math.floor(Math.abs(actual-t)/86400000);let totalSeconds=Math.floor(Math.abs(actual-t)/1000);let deltaHours=Math.floor((totalSeconds%86400)/3600),deltaMinutes=Math.floor((totalSeconds%3600)/60),deltaSecs=totalSeconds%60;let deltaLabel=(deltaDays?deltaDays+'日 ':'')+String(deltaHours).padStart(2,'0')+'時間 '+String(deltaMinutes).padStart(2,'0')+'分 '+String(deltaSecs).padStart(2,'0')+'秒';let totalHoursLabel=Math.floor(totalSeconds/3600)+'時間';$('convertResult').classList.remove('hidden');$('convertResult').innerHTML=`<div>映像に表示された時刻</div><div>${fmt(t)}</div><div>適用した誤差</div><div>${dur(o)} ${o<0?'遅れ':o>0?'進み':'誤差なし'}</div><div>誤差の合計</div><div>${deltaLabel} ${o<0?'遅れ':o>0?'進み':''}</div><div>合計時間（時間換算）</div><div>${totalHoursLabel}</div><div>換算した実際の時刻</div><div class="big">${fmt(actual)}</div>`};
+$('reverseConvertBtn').onclick=()=>{let t=stamp('reverseActual');let h=Number($('offsetHour').value),m=Number($('offsetMinute').value),sec=Number($('offsetSecond').value);if(!Number.isFinite(t)||![h,m,sec].every(Number.isFinite)||h<0||h>99||m<0||m>59||sec<0||sec>59)return alert('実際の日時と誤差を正しく入力してください。');let magnitude=h*3600+m*60+sec;let direction=$('offsetDirection').value;let offset=direction==='slow'?-magnitude:magnitude;let cameraTime=t+offset*1000;$('reverseConvertResult').classList.remove('hidden');$('reverseConvertResult').innerHTML=`<div>入力した実際の時刻</div><div>${fmt(t)}</div><div>適用した誤差</div><div>${dur(offset)} ${offset<0?'遅れ':offset>0?'進み':'誤差なし'}</div><div>算出したカメラの表示時刻</div><div class="big">${fmt(cameraTime)}</div>`;};
+$('saveCamera').onclick=()=>{let name=$('cameraName').value.trim(),address=$('cameraAddress').value.trim(),folder=$('cameraFolder').value.trim()||'未分類',o=signedOffset('manage');if(!name)return alert('カメラ名称を入力してください。');if(!Number.isFinite(o))return alert('誤差を正しく入力してください。');cameras.push({name,address,folder,offset:o});$('cameraName').value='';$('cameraAddress').value='';$('cameraFolder').value='';save();alert('カメラを保存しました。')};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['measure','convert','manage'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab))});
+initScrollPickers();let now=new Date();['actual','camera','footage'].forEach(p=>{$(p+'Date').value=localDate(now);$(p+'Hour').value=String(now.getHours());$(p+'Minute').value=String(now.getMinutes());$(p+'Second').value=String(now.getSeconds())});['reverseActual'].forEach(p=>{$(p+'Date').value=localDate(now);$(p+'Hour').value=String(now.getHours());$(p+'Minute').value=String(now.getMinutes());$(p+'Second').value=String(now.getSeconds())});$('exportBackup').onclick=()=>{const payload={format:'bouhan-camera-backup',version:1,exportedAt:new Date().toISOString(),cameras};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='bouhan_camera_backup_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);alert('バックアップファイルを保存しました。ファイルアプリなどで保存先を確認してください。');};
+$('importBackupBtn').onclick=async()=>{const file=$('importBackup').files[0];if(!file)return alert('先にバックアップのJSONファイルを選択してください。');try{const data=JSON.parse(await file.text());const list=Array.isArray(data)?data:data.cameras;if(!Array.isArray(list)||!list.every(c=>c&&typeof c.name==='string'&&Number.isFinite(Number(c.offset))))throw new Error('形式');if(!confirm('現在のカメラ登録をバックアップ内容に置き換えます。続けますか？'))return;cameras=list.map(c=>({...c,offset:Number(c.offset),history:Array.isArray(c.history)?c.history:[]}));save();alert('バックアップを復元しました。');}catch(e){alert('バックアップファイルを読み込めませんでした。正しいJSONファイルか確認してください。');}};
+render();
+</script></body></html>
