@@ -1,149 +1,531 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#123d68">
-<title>防犯カメラ時刻管理</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17324d">
+<title>勤務管理</title>
 <style>
-:root{--navy:#123d68;--blue:#1769aa;--bg:#f2f6fa;--ink:#172b3d;--muted:#607386;--line:#d6e1eb;--green:#16734b;--red:#b72e42;--amber:#8a5a00}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
-header{background:linear-gradient(120deg,#102f50,#1769aa);color:white;padding:19px 16px}header h1{font-size:1.25rem;margin:0 0 5px}header p{font-size:.86rem;margin:0;opacity:.9}
-main{max-width:850px;margin:auto;padding:12px}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:3px 0 12px}.tab{padding:11px 5px;background:white;color:var(--blue);border:1px solid var(--line);border-radius:11px;font-size:.88rem;font-weight:750}.tab.active{background:var(--blue);color:white;border-color:var(--blue)}
-.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 3px 12px #173b5b0a}h2{font-size:1.02rem;margin:0 0 10px}h3{font-size:.94rem;margin:14px 0 6px}.hint{font-size:.82rem;color:var(--muted);line-height:1.5;margin:7px 0}
-label{display:block;font-size:.88rem;font-weight:700;margin:11px 0 5px}input,select,textarea{width:100%;font:inherit;padding:11px;border:1px solid #c4d2df;border-radius:9px;background:#fff;color:var(--ink)}textarea{min-height:70px;resize:vertical}
-button{font:inherit;font-weight:700;border:0;border-radius:9px;padding:11px 13px;cursor:pointer}.primary{background:var(--blue);color:#fff;width:100%;margin-top:13px}.secondary{background:#e8f2fb;color:var(--blue)}.danger{background:#fff0f2;color:var(--red);padding:8px 10px}.small{font-size:.82rem;padding:8px 10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.triple{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.hidden{display:none!important}.result{background:#edf9f2;border:1px solid #a8dfc0;border-radius:11px;padding:13px;margin-top:12px}.big{font-size:1.25rem;font-weight:850;color:var(--green);margin:4px 0;overflow-wrap:anywhere}.card{border:1px solid var(--line);border-radius:11px;padding:11px;margin-top:9px}.cardhead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.name{font-weight:800}.meta{font-size:.83rem;color:var(--muted);margin:5px 0;line-height:1.45}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.badge{display:inline-block;font-size:.72rem;padding:3px 7px;border-radius:20px;background:#edf3f8;color:#3e566b}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{background:#edf4fa;border-radius:10px;padding:10px;text-align:center}.stat strong{display:block;font-size:1.2rem;color:var(--navy)}.stat span{font-size:.75rem;color:var(--muted)}.foot{text-align:center;font-size:.75rem;color:var(--muted);padding:10px 8px 25px}.history{display:grid;gap:6px}.historyrow{padding:8px 10px;border-left:3px solid var(--blue);background:#f3f7fb;border-radius:5px;font-size:.84rem;line-height:1.5}.warning{background:#fff8e8;border:1px solid #ead39b;border-radius:10px;padding:10px;font-size:.82rem;color:#6f4d00;line-height:1.5}.empty{padding:15px;text-align:center;color:var(--muted);font-size:.88rem}.folder-group{border:1px solid var(--line);border-radius:12px;background:#fff;margin:9px 0;overflow:hidden}.folder-toggle{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#eaf2f9;color:var(--navy);padding:14px 12px;border-radius:0}.folder-icon{font-size:1.35rem}.folder-title{flex:1;min-width:0;overflow-wrap:anywhere}.folder-count{font-size:.78rem;font-weight:700;color:var(--muted);white-space:nowrap}.folder-chevron{font-size:1rem;transition:transform .15s}.folder-toggle[aria-expanded="true"] .folder-chevron{transform:rotate(90deg)}.folder-items{padding:0 9px 9px}.folder-items[hidden]{display:none}
-@media(max-width:480px){main{padding:9px}.panel{padding:12px}.grid{grid-template-columns:1fr}.triple{gap:5px}.triple input{padding:10px 7px}.tab{font-size:.78rem}.stats{gap:5px}.stat{padding:8px 3px}}
+:root{--navy:#17324d;--blue:#2463a6;--pale:#eef4f9;--line:#d7e0e8;--ink:#17212b;--muted:#637384;--red:#a63232}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6f9;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;font-size:14px}
+header{background:var(--navy);color:white;padding:7px 9px;position:sticky;top:0;z-index:5;box-shadow:0 2px 8px #0002}
+h1{font-size:16px;margin:0}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.topline{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+.topline label{display:none}
+.topline label{font-size:12px;color:#e4edf5}
+input,select,button,textarea{font:inherit}
+input[type=date],select,input[type=text],input[type=time]{min-height:38px;border:1px solid #bdcad6;border-radius:8px;padding:6px 8px;background:white;color:var(--ink);max-width:100%}
+#recordDate{font-size:16px;font-weight:700}
+main{padding:12px;max-width:900px;margin:auto}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
+button{border:0;border-radius:9px;padding:10px 12px;background:var(--blue);color:white;font-weight:650;cursor:pointer}
+button.secondary{background:#e3ebf3;color:#20384e}
+button.danger{background:#a63232}
+button.small{padding:7px 9px;font-size:12px}
+.status{color:var(--muted);font-size:12px;margin-left:auto;align-self:center}
+#people{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.name-manager{background:white;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.name-manager>strong{display:block;margin-bottom:8px}
+.name-manager-row{display:flex;gap:7px}
+.name-manager-row input{flex:1;min-width:0}
+.name-roster{display:flex;flex-wrap:wrap;gap:6px}
+.name-count{display:inline-block;background:var(--pale);color:var(--navy);border:0;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer}\n.name-list{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin-top:7px}\n.name-list[hidden]{display:none}\n.name-list-item{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;box-sizing:border-box;background:#f4f7fa;border:1px solid var(--line);border-radius:7px;padding:7px 8px;font-size:12px;color:var(--ink)}
+.name-list-label{flex:1;min-width:0;padding:2px 3px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}.holiday-editor{flex-basis:100%;background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px;margin-top:5px}.holiday-editor h3{font-size:13px;margin:0 0 8px}.holiday-editor-row{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin:6px 0}.holiday-editor-row input{min-width:0;width:100%}.holiday-date-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid #e6edf2}.holiday-date-item button{padding:4px 7px;font-size:10px}
+.name-delete{background:#a63232;color:white;border:0;border-radius:5px;padding:4px 6px;font-size:10px;cursor:pointer}
+.attendance-group{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.type-row{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;align-items:start}
+.type-row .field{min-width:0}
+.type-row input[type=date]{width:100%;min-width:0}
+
+.attendance-group .field{min-width:0}\n.conditional-detail{grid-column:1/-1;background:#f5f8fb;border-left:3px solid #8baed1;border-radius:5px;padding:5px 6px;margin-top:-2px}\n.conditional-detail[hidden]{display:none}\n
+.name-chip{background:var(--pale);border-radius:7px;padding:5px 8px;font-size:12px;color:var(--navy)}
+.person{background:white;border:1px solid var(--line);border-radius:13px;padding:12px;box-shadow:0 2px 5px #10203008}
+.person-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.person-head h2{font-size:17px;margin:0;flex:1}
+.person-head input{width:100%;max-width:230px;font-weight:700}
+.person-no{background:var(--pale);color:var(--navy);border-radius:7px;padding:5px 8px;font-weight:800}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{min-width:0}\n.conditional-detail{grid-column:1/-1;background:#f5f8fb;border-left:3px solid #8baed1;border-radius:5px;padding:5px 6px;margin-top:-2px}\n.conditional-detail[hidden]{display:none}\n
+.field.full{grid-column:1/-1}
+.field>label,.field-title{display:block;font-size:12px;color:#45586a;font-weight:750;margin:0 0 4px}
+.field select,.field input[type=text]{width:100%}
+.timepair{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:5px}
+.checkrow{display:flex;align-items:center;gap:9px;min-height:38px;flex-wrap:wrap}
+.checkrow label{display:flex;align-items:center;gap:5px}
+input[type=checkbox]{width:19px;height:19px;accent-color:var(--blue)}
+.inline-detail{display:grid;grid-template-columns:1fr;gap:7px;margin-top:6px}
+.inline-detail[hidden]{display:none}
+.person-foot{display:flex;justify-content:flex-end;margin-top:10px}
+.pager{display:flex;align-items:center;justify-content:center;gap:12px;margin:15px 0}
+.pager button{min-width:78px}
+#pageLabel{font-weight:800}
+.empty{background:white;border:1px dashed #b7c5d2;padding:24px;border-radius:12px;text-align:center;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);line-height:1.6;margin:12px 2px}
+.saved-list{margin-top:22px;background:white;border:1px solid var(--line);border-radius:12px;padding:12px}
+.saved-list h2{font-size:16px;margin:0 0 8px}
+.saved-entry{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid #e6edf2}
+.saved-entry .date-label{font-weight:750;flex:1}
+.saved-entry small{color:var(--muted)}
+@media(min-width:720px){#people{grid-template-columns:repeat(2,minmax(0,1fr))}.person{min-width:0}}
+@media(max-width:430px){
+ body{font-size:10px} header{padding:4px 7px} h1{font-size:13px;margin-bottom:0}
+ .header-row{gap:4px} .topline{gap:4px} #recordDate{width:124px;min-width:0;font-size:11px;min-height:27px;padding:2px}
+ #loadDate{padding:5px 5px;font-size:9px;white-space:nowrap}
+ main{padding:3px} .toolbar{gap:3px;margin-bottom:3px} button{padding:5px 6px;font-size:10px}
+ .status{display:none}
+ #people{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ .person{padding:3px;border-radius:7px} .person-head{gap:3px;margin-bottom:2px;flex-wrap:nowrap}
+ .person-head h2{font-size:11px} .person-head input{max-width:none;min-width:0;flex:1;font-size:10px;min-height:25px;padding:2px}
+ .person-no{padding:3px;font-size:9px} .person-head button{padding:4px;font-size:9px}
+ .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:1px}
+ .paired-row{grid-column:1/-1;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:3px}
+ .field.full{grid-column:auto}
+ .field>label,.field-title{font-size:9px;margin-bottom:0;line-height:1}
+ input[type=date],select,input[type=text],input[type=time]{min-height:25px;padding:2px;font-size:10px;border-radius:4px}
+ .timepair{gap:2px;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+ .timepair select{min-width:0;width:100%;padding:3px 1px;font-size:11px;letter-spacing:-.3px}
+ .field:has(.timepair){grid-column:1/-1}\n 
+ .field:has(.timepair) select{font-size:12px;min-height:29px;padding:3px 2px}
+ .checkrow{gap:2px;min-height:18px;flex-wrap:nowrap} .checkrow label{gap:2px;font-size:9px;white-space:nowrap}
+ input[type=checkbox]{width:12px;height:12px;margin:0}
+ .inline-detail{gap:3px}
+ .pager{margin:5px 0;gap:6px} .pager button{min-width:52px}
+ .note{font-size:9px;margin:4px 1px} .saved-list{margin-top:7px;padding:6px} .saved-list h2{font-size:12px}
+ main>p.note{display:none}
+ .name-manager{padding:5px;margin-bottom:4px} .name-manager-row input{min-width:0}
+ .name-manager .note{display:none}
+}
+</style>
+<style>
+
+.field:has(.remarks-area){grid-column:1/-1!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;margin-top:0!important;margin-bottom:0!important;gap:1px!important}.field:has(.remarks-area)>label{margin-bottom:0!important;line-height:1.1!important}
+</style>
+<style>
+.fields .field:has(textarea.remarks-area){grid-column:1/-1!important;width:100%!important;min-width:0!important}
+textarea
+</style>
+<style>
+.person .field:has(textarea.remarks-area){grid-column:1/-1!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;position:static!important;transform:none!important}
+textarea
+</style>
+<style>
+textarea
+</style>
+<style>
+#people textarea
+</style><style>
+#people textarea.remarks-area {
+ display:block !important;
+ width:100% !important;
+ max-width:100% !important;
+ height:42px !important;
+ min-height:42px !important;
+ max-height:none !important;
+ resize:vertical !important;
+ box-sizing:border-box !important;
+ overflow-x:hidden !important;
+ overflow-y:auto !important;
+ white-space:pre-wrap !important;
+ overflow-wrap:anywhere !important;
+ word-break:normal !important;
+ font-size:10px !important;
+ line-height:13px !important;
+ padding:2px 3px !important;
+}
 </style></head>
 <body>
-<header><h1>📹 防犯カメラ時刻管理</h1><p>施設・カメラ・時刻誤差・換算履歴を端末内で管理</p></header>
+<header>
+  <div class="header-row">
+    <h1>勤務管理</h1>
+    <div class="topline">
+    <input type="date" id="recordDate" aria-label="勤務日">
+    <button class="small secondary" id="loadDate">この日で作成</button>
+    </div>
+  </div>
+</header>
 <main>
-<div class="tabs">
-<button class="tab active" data-tab="measure">誤差を計算</button><button class="tab" data-tab="convert">時刻を換算</button><button class="tab" data-tab="manage">カメラ管理</button>
-</div>
-<section id="measure" class="panel">
-<h2>① 実際の時刻とカメラ時刻を比較</h2>
-<p class="hint">同じ瞬間について、基準となる実際の時刻とカメラに表示された時刻を入力します。</p>
-<label for="measureCamera">登録済みカメラ（任意）</label>
-<select id="measureCamera"><option value="">カメラを選択</option></select>
-<p class="hint">登録済みカメラを選ぶと名称・住所を呼び出せます。新しいカメラは下の欄に入力してください。</p>
-<label for="measureCameraName">カメラ名称（任意）</label><input id="measureCameraName" placeholder="例：駅北口カメラ">
-<label for="measureCameraAddress">住所（任意）</label><input id="measureCameraAddress" placeholder="例：東京都西東京市保谷町">
-<label>実際の時刻</label>
-<input id="actualDate" type="date">
-<div class="triple">
-<div><label for="actualHour">時</label><select id="actualHour" aria-label="actualHour"></select></div>
-<div><label for="actualMinute">分</label><select id="actualMinute" aria-label="actualMinute"></select></div>
-<div><label for="actualSecond">秒</label><select id="actualSecond" aria-label="actualSecond"></select></div>
-</div>
-<label>カメラの表示時刻</label>
-<input id="cameraDate" type="date">
-<div class="triple">
-<div><label for="cameraHour">時</label><select id="cameraHour" aria-label="cameraHour"></select></div>
-<div><label for="cameraMinute">分</label><select id="cameraMinute" aria-label="cameraMinute"></select></div>
-<div><label for="cameraSecond">秒</label><select id="cameraSecond" aria-label="cameraSecond"></select></div>
-</div>
-<button class="primary" id="calcBtn">誤差を計算する</button>
-<div id="measureResult" class="result hidden"></div>
-<p class="hint">※「遅れ」はカメラの時計が実際より遅い状態、「進み」は実際より進んでいる状態です。</p>
-</section>
-<section id="convert" class="panel hidden">
-<h2>② 映像時刻を実際の時刻に換算</h2>
-<p class="hint">誤差を入力するか、保存済みカメラを選んで換算できます。符号は「カメラが進み／遅れ」の選択で指定します。</p>
-<label for="convertCamera">保存したカメラ（任意）</label><select id="convertCamera"><option value="">手入力する</option></select>
-<h3>誤差（時間・分・秒）</h3>
-<label for="offsetHour">時間</label><select id="offsetHour" aria-label="offsetHour"></select>
-<label for="offsetMinute">分</label><select id="offsetMinute" aria-label="offsetMinute"></select>
-<label for="offsetSecond">秒</label><select id="offsetSecond" aria-label="offsetSecond"></select>
-<label for="offsetDirection">カメラの状態</label><select id="offsetDirection"><option value="slow">遅れている</option><option value="fast">進んでいる</option></select>
-<label>映像に表示された時刻</label>
-<input id="footageDate" type="date">
-<div class="triple">
-<div><label for="footageHour">時</label><select id="footageHour" aria-label="footageHour"></select></div>
-<div><label for="footageMinute">分</label><select id="footageMinute" aria-label="footageMinute"></select></div>
-<div><label for="footageSecond">秒</label><select id="footageSecond" aria-label="footageSecond"></select></div>
-</div>
-<button class="primary" id="convertBtn">実際の時刻に換算</button>
-<div id="convertResult" class="result hidden"></div>
-<p class="hint">例：カメラが3分30秒遅れている場合、映像の表示時刻に3分30秒を足します。</p>
-<hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
-<h2>実際の時刻からカメラの表示時刻を計算</h2>
-<p class="hint">上の誤差設定または登録済みカメラの誤差を使い、実際の時刻にカメラの進み・遅れを反映します。</p>
-<label>実際の時刻</label>
-<input id="reverseActualDate" type="date">
-<div class="triple">
-<div><label for="reverseActualHour">時</label><select id="reverseActualHour" aria-label="reverseActualHour"></select></div>
-<div><label for="reverseActualMinute">分</label><select id="reverseActualMinute" aria-label="reverseActualMinute"></select></div>
-<div><label for="reverseActualSecond">秒</label><select id="reverseActualSecond" aria-label="reverseActualSecond"></select></div>
-</div>
-<button class="primary" id="reverseConvertBtn">カメラの表示時刻を計算</button>
-<div id="reverseConvertResult" class="result hidden"></div>
-<p class="hint">計算方法：遅れているカメラは実際の時刻から誤差を引き、進んでいるカメラは誤差を足します。</p>
-</section>
-<section id="manage" class="panel hidden">
-<h2>③ カメラごとの誤差を保存</h2>
-<div class="card">
-<h3>📦 バックアップ・復元</h3>
-<p class="hint">登録したカメラ情報と誤差履歴をファイルに保存できます。機種変更やデータ消失に備えて、定期的にバックアップしてください。</p>
-<button type="button" class="secondary" id="exportBackup">バックアップを保存</button>
-<label for="importBackup">バックアップファイルから復元</label>
-<input type="file" id="importBackup" accept=".json,application/json">
-<button type="button" class="secondary" id="importBackupBtn">選択したファイルを復元</button>
-<p class="hint">復元すると、現在のカメラ登録はバックアップ内容に置き換わります。必要なら先にバックアップしてください。</p>
-</div>
-<p class="hint">カメラ名と誤差を登録しておくと、時刻換算で呼び出せます。データはこのブラウザ内に保存されます。</p>
-<label for="cameraName">カメラ名称</label><input id="cameraName" placeholder="例：西武柳沢駅 北口カメラ">
-<label for="cameraAddress">住所</label><input id="cameraAddress" placeholder="例：東京都西東京市保谷町">
-<label for="cameraFolder">フォルダ名（任意）</label><input id="cameraFolder" list="folderSuggestions" placeholder="例：新宿駅、○○署、田無エリア"><datalist id="folderSuggestions"></datalist><p class="hint">好きなフォルダ名を入力できます。空欄の場合は「未分類」になります。</p>
-<h3>誤差（時間・分・秒）</h3>
-<label for="manageHour">時間</label><select id="manageHour" aria-label="manageHour"></select>
-<label for="manageMinute">分</label><select id="manageMinute" aria-label="manageMinute"></select>
-<label for="manageSecond">秒</label><select id="manageSecond" aria-label="manageSecond"></select>
-<label for="manageDirection">カメラの状態</label><select id="manageDirection"><option value="slow">遅れている</option><option value="fast">進んでいる</option></select>
-<button class="primary" id="saveCamera">このカメラを保存</button>
-<label for="cameraFolderFilter">フォルダで絞り込み</label><select id="cameraFolderFilter"><option value="">すべてのフォルダ</option></select>
-<label for="cameraSearch">登録カメラを検索（名称・住所）</label><input id="cameraSearch" type="search" placeholder="例：駅名、施設名、住所"><p class="hint" id="cameraSearchCount"></p><div id="cameraList"></div>
-</section>
+  <div class="toolbar">
+    <button id="addPerson">＋ 人を追加</button>
+    <button class="danger" id="newDay">新規作成</button>
+    <button class="secondary" id="saveDay">この日の内容を保存</button>
+    <button class="secondary" id="exportData">バックアップ保存</button>
+    <button class="secondary" id="importBtn">復元</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+    <span class="status" id="status">端末内に自動保存</span>
+  </div>
+  <div id="people"></div>
+  <div class="pager">
+    <button class="secondary" id="prevPage">‹ 前へ</button>
+    <span id="pageLabel">1 / 1 ページ</span>
+    <button class="secondary" id="nextPage">次へ ›</button>
+  </div>
+  <p class="note">1画面に4人分ずつ表示します。5人目以降は2ページ目に表示されます。入力内容はこの端末のブラウザ内に自動保存されます。機種変更や別の端末に移す場合は「バックアップ保存」を使ってください。</p>
+  <section class="saved-list">
+    <h2>保存済みの日付</h2>
+    <div id="savedDates"></div>
+  </section>
+  <section class="name-manager">
+    <strong>名前の登録</strong>
+    <div class="name-manager-row">
+      <input type="text" id="newName" placeholder="名前を入力して登録" maxlength="40">
+      <button id="registerName">名前を保存</button>
+    </div>
+    <div class="note">ここで一度登録すると、勤務記録の名前欄から次回以降も選べます。</div>
+    <div id="nameRoster" class="name-roster"></div>
+  </section>
 </main>
-<div class="foot">計算結果は入力された時刻に基づくものです。証拠映像の確認時は、基準時刻や秒単位の読み取りも再確認してください。</div>
 <script>
-const $=id=>document.getElementById(id), KEY='bouhanSimpleCamerasV2';
-const openFolders=new Set();
-const pad=n=>String(n).padStart(2,'0');
-function localDate(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
-function fmt(ms){let d=new Date(ms);return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}
-function dur(sec){sec=Math.abs(Math.round(sec));let d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60),s=sec%60,a=[];if(d)a.push(d+'日');if(h||d)a.push(h+'時間');if(m||d||h)a.push(m+'分');if(s||!a.length)a.push(s+'秒');return a.join(' ')}
-function stamp(prefix){let date=$(prefix+'Date').value,h=$(prefix+'Hour').value,m=$(prefix+'Minute').value,s=$(prefix+'Second').value;if(!date||h===''||m===''||s==='')return NaN;h=Number(h);m=Number(m);s=Number(s);if(!Number.isInteger(h)||h<0||h>23||!Number.isInteger(m)||m<0||m>59||!Number.isInteger(s)||s<0||s>59)return NaN;return new Date(date+'T'+pad(h)+':'+pad(m)+':'+pad(s)).getTime()}
-function seconds(h,m,s){h=Number(h);m=Number(m);s=Number(s);if(!Number.isInteger(h)||h<0||!Number.isInteger(m)||m<0||m>59||!Number.isInteger(s)||s<0||s>59)return NaN;return h*3600+m*60+s}
-function signedOffset(prefix){let n=seconds($(prefix+'Hour').value,$(prefix+'Minute').value,$(prefix+'Second').value);return $(prefix+'Direction').value==='slow'? -n:n}
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return []}}
-let cameras=load();
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function save(){localStorage.setItem(KEY,JSON.stringify(cameras));render()}
-function initScrollPickers(){
-const ranges={actualHour:23,actualMinute:59,actualSecond:59,cameraHour:23,cameraMinute:59,cameraSecond:59,offsetHour:99,offsetMinute:59,offsetSecond:59,footageHour:23,footageMinute:59,footageSecond:59,reverseActualHour:23,reverseActualMinute:59,reverseActualSecond:59,manageHour:99,manageMinute:59,manageSecond:59};
-for(const [id,max] of Object.entries(ranges)){const el=$(id);const old=el.value;el.innerHTML='';for(let i=0;i<=max;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=pad(i);el.appendChild(opt)}el.value=old!==''?old:'0';}
+(function(){
+const TYPES=['日勤','週休','代休','祝休','祝代休','夏特','夏休','冬休'];
+const $=id=>document.getElementById(id);
+const STORAGE='workResultRecords_v1';
+let records=readStore(), currentDate=localDate(), people=[], page=0, dirty=false;
+const NAME_STORAGE='workResultNames_v1';
+const HOLIDAY_STORAGE='workResultHolidayDates_v1';
+const AUTO_HOLIDAY_STORAGE='workResultAutoHolidayDates_v1';
+let autoHolidayDates=readAutoHolidayDates();
+function readAutoHolidayDates(){try{const x=JSON.parse(localStorage.getItem(AUTO_HOLIDAY_STORAGE)||'{}');return x&&typeof x==='object'?x:{}}catch(e){return {}}}
+function writeAutoHolidayDates(){try{localStorage.setItem(AUTO_HOLIDAY_STORAGE,JSON.stringify(autoHolidayDates));return true}catch(e){return false}}
+function markAutoHolidayDate(name,key,dateStr){autoHolidayDates[name]=autoHolidayDates[name]||{compensatory:[],holiday:[]};autoHolidayDates[name][key]=Array.isArray(autoHolidayDates[name][key])?autoHolidayDates[name][key]:[];if(!autoHolidayDates[name][key].includes(dateStr)){autoHolidayDates[name][key].push(dateStr);writeAutoHolidayDates()}}
+function cancelAutoHolidayDate(name,key,dateStr){
+ const tracked=autoHolidayDates[name]?.[key];
+ if(!Array.isArray(tracked)||!tracked.includes(dateStr))return;
+ autoHolidayDates[name][key]=tracked.filter(d=>d!==dateStr);
+ writeAutoHolidayDates();
+ const stillUsedByOtherWork=Object.entries(records).some(([date,rec])=>date!==currentDate&&rec&&Array.isArray(rec.people)&&rec.people.some(p=>p&&p.name===name&&p.type==='日勤'&&date===dateStr));
+ if(!stillUsedByOtherWork){
+  const arr=datesFor(name,key);
+  holidayDates[name]=holidayDates[name]||{compensatory:[],holiday:[]};
+  holidayDates[name][key]=arr.filter(d=>d!==dateStr);
+  writeHolidayDates();
+ }
 }
-function render(){let repairTime=new Date().toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});let repaired=false;cameras.forEach(c=>{if(!c.folder)c.folder='未分類';if(Array.isArray(c.history)){c.history.forEach(h=>{if(!h.measuredAt){h.measuredAt=c.measuredAt||repairTime;repaired=true;}});}if(!c.measuredAt){c.measuredAt=repairTime;repaired=true;}});if(repaired)save();$('convertCamera').innerHTML='<option value="">手入力する</option>'+cameras.map((c,i)=>`<option value="${i}">${esc(c.name)}（${dur(c.offset)} ${c.offset<0?'遅れ':'進み'}）</option>`).join('');
-$('measureCamera').innerHTML='<option value="">カメラを選択</option>'+cameras.map((c,i)=>`<option value="${i}">${esc(c.name)}</option>`).join('');
-const folders=[...new Set(cameras.map(c=>c.folder||'未分類'))].sort((a,b)=>a.localeCompare(b,'ja'));const currentFolder=$('cameraFolderFilter').value;$('cameraFolderFilter').innerHTML='<option value="">すべてのフォルダ</option>'+folders.map(f=>`<option value="${esc(f)}">${esc(f)}</option>`).join('');if(folders.includes(currentFolder))$('cameraFolderFilter').value=currentFolder;$('folderSuggestions').innerHTML=folders.map(f=>`<option value="${esc(f)}"></option>`).join('');
-const query=($('cameraSearch')?.value||'').trim().toLocaleLowerCase();const folderFilter=$('cameraFolderFilter').value;const visibleCameras=cameras.map((c,i)=>({c,i})).filter(({c})=>(!folderFilter||(c.folder||'未分類')===folderFilter)&&(!query||String(c.name||'').toLocaleLowerCase().includes(query)||String(c.address||'').toLocaleLowerCase().includes(query)));$('cameraSearchCount').textContent=`${visibleCameras.length}件表示 / 登録 ${cameras.length}件`;
-const grouped=new Map();visibleCameras.forEach(item=>{const f=item.c.folder||'未分類';if(!grouped.has(f))grouped.set(f,[]);grouped.get(f).push(item)});
-function cameraCard({c,i}){let history=Array.isArray(c.history)?c.history.slice():[];if(!history.length&&c.previousChange)history=[{measuredAt:c.previousChange.measuredAt||'日時記録なし',offset:c.previousChange.offset},{measuredAt:c.measuredAt||'日時記録なし',offset:c.offset}];if(!history.length)history=[{measuredAt:c.measuredAt||'日時記録なし',offset:c.offset}];return `<div class="card"><div class="cardhead"><div><div class="name">${esc(c.name)}</div><div class="meta">${c.address?`住所：${esc(c.address)}<br>`:''}現在の誤差：${dur(c.offset)} ${c.offset<0?'遅れ':c.offset>0?'進み':'誤差なし'}${c.measuredAt?`<br>今回の計測日時：${esc(c.measuredAt)}`:''}</div></div><button class="danger small" onclick="removeCamera(${i})">削除</button></div><div class="actions"><button class="secondary small" onclick="moveCameraFolder(${i})">フォルダを変更</button><button class="secondary small" onclick="goCalculate(${i})">時刻を計算</button></div><h3>誤差の記録（${history.length}件）</h3><div class="history">${history.slice().reverse().map(h=>`<div class="historyrow"><strong>${esc(h.measuredAt||'日時記録なし')}</strong><br>${dur(h.offset)} ${h.offset<0?'遅れ':h.offset>0?'進み':'誤差なし'}</div>`).join('')}</div></div>`}
-$('cameraList').innerHTML=grouped.size?[...grouped.entries()].sort((a,b)=>a[0].localeCompare(b[0],'ja')).map(([folder,items])=>{const isOpen=query?true:openFolders.has(folder);return `<section class="folder-group"><button type="button" class="folder-toggle" aria-expanded="${isOpen}" data-folder="${esc(folder)}"><span class="folder-icon">📁</span><span class="folder-title">${esc(folder)}</span><span class="folder-count">${items.length}件</span><span class="folder-chevron">▶</span></button><div class="folder-items" ${isOpen?'':'hidden'}>${items.map(cameraCard).join('')}</div></section>`}).join(''):(cameras.length?'<div class="empty">条件に一致するカメラはありません。</div>':'<div class="empty">保存したカメラはありません。</div>')}
-window.toggleFolder=name=>{if(openFolders.has(name))openFolders.delete(name);else openFolders.add(name);render()};
-$('cameraList').addEventListener('click',event=>{const button=event.target.closest('.folder-toggle');if(button){const name=button.dataset.folder;if(openFolders.has(name))openFolders.delete(name);else openFolders.add(name);render();}});
-$('cameraSearch').addEventListener('input',render);$('cameraFolderFilter').addEventListener('change',render);
-window.moveCameraFolder=i=>{const current=cameras[i].folder||'未分類';const name=prompt('移動先のフォルダ名を入力してください。\\n既存のフォルダ名でも、新しい名前でもOKです。',current);if(name===null)return;cameras[i].folder=name.trim()||'未分類';save();};
-window.removeCamera=i=>{if(confirm('このカメラを削除しますか？')){cameras.splice(i,1);save()}};
-window.goCalculate=i=>{document.querySelector('[data-tab="convert"]').click();$('convertCamera').value=String(i);$('convertCamera').dispatchEvent(new Event('change'));window.scrollTo({top:0,behavior:'smooth'});};
-$('calcBtn').onclick=()=>{let a=stamp('actual'),c=stamp('camera');if(!Number.isFinite(a)||!Number.isFinite(c))return alert('日付・時・分・秒を正しく入力してください。');let off=Math.round((c-a)/1000),absDiff=Math.abs(Math.round(off)),dayCount=Math.floor(absDiff/86400),totalHours=Math.floor(absDiff/3600),idx=$('measureCamera').value===''?-1:Number($('measureCamera').value),chosen=idx>=0?cameras[idx]:null,changed=!!chosen&&chosen.offset!==off,camLabel=chosen?`<div>対象カメラ：${esc(chosen.name)}</div>`:'';$('measureResult').classList.remove('hidden');$('measureResult').innerHTML=`${camLabel}<div>カメラの時刻誤差</div><div class="big">${dur(off)} ${off<0?'遅れ':off>0?'進み':'誤差なし'}</div><div>日数：${dayCount}日</div><div>合計時間：${totalHours}時間</div><div class="meta">実際：${fmt(a)}<br>カメラ：${fmt(c)}</div>${changed?`<div class="warning"><strong>⚠️ 登録済みの誤差から変化しています</strong><br>前回の誤差：${dur(chosen.offset)} ${chosen.offset<0?'遅れ':chosen.offset>0?'進み':'誤差なし'}<br>今回の誤差：${dur(off)} ${off<0?'遅れ':off>0?'進み':'誤差なし'}<br>登録すると、カメラ管理で前回と今回の計測日時・誤差を見比べられます。</div>`:''}<button class="primary" id="registerCalculatedCamera">${chosen?'計算結果をカメラ管理に登録・更新':'計算結果をカメラ管理に登録'}</button>`;$('registerCalculatedCamera').onclick=()=>{let name=$('measureCameraName').value.trim(),address=$('measureCameraAddress').value.trim();if(!name&&chosen)name=chosen.name;if(!address&&chosen)address=chosen.address||'';if(!name)return alert('登録するカメラ名称を入力してください。');let measuredAt=new Date().toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replaceAll('/','/');if(chosen){if(!Array.isArray(chosen.history)){chosen.history=chosen.previousChange?[{offset:chosen.previousChange.offset,measuredAt:chosen.previousChange.measuredAt||''},{offset:chosen.offset,measuredAt:chosen.measuredAt||''}]:[{offset:chosen.offset,measuredAt:chosen.measuredAt||''}];}chosen.history=chosen.history.map(item=>({...item,measuredAt:item.measuredAt||chosen.measuredAt||measuredAt}));if(changed){if(!chosen.history.length||chosen.history[chosen.history.length-1].offset!==chosen.offset||chosen.history[chosen.history.length-1].measuredAt!==(chosen.measuredAt||'')){chosen.history.push({offset:chosen.offset,measuredAt:chosen.measuredAt||''});}chosen.history.push({offset:off,measuredAt});}chosen.name=name;chosen.address=address;chosen.offset=off;chosen.measuredAt=measuredAt;if(!chosen.history.length)chosen.history.push({offset:off,measuredAt});save();$('measureCamera').value=String(idx);alert(changed?'誤差を更新しました。カメラ管理で過去の記録をすべて確認できます。':'カメラ情報を更新しました。誤差が同じため履歴は追加していません。');}else{cameras.push({name,address,folder:'未分類',offset:off,measuredAt,history:[{offset:off,measuredAt}]});save();$('measureCamera').value=String(cameras.length-1);alert('計算した誤差をカメラ管理に登録しました。');}render();};};
-$('measureCamera').onchange=()=>{let c=cameras[Number($('measureCamera').value)];if(c){$('measureCameraName').value=c.name;$('measureCameraAddress').value=c.address||'';}else{$('measureCameraName').value='';$('measureCameraAddress').value='';}};
-$('convertCamera').onchange=()=>{let c=cameras[Number($('convertCamera').value)];if(!c)return;$('offsetHour').value=Math.floor(Math.abs(c.offset)/3600);$('offsetMinute').value=Math.floor(Math.abs(c.offset)%3600/60);$('offsetSecond').value=Math.abs(c.offset)%60;$('offsetDirection').value=c.offset<0?'slow':'fast'};
-$('convertBtn').onclick=()=>{let t=stamp('footage');let h=Number($('offsetHour').value),m=Number($('offsetMinute').value),s=Number($('offsetSecond').value);if(!Number.isFinite(t)||![h,m,s].every(Number.isFinite)||h<0||h>99||m<0||m>59||s<0||s>59)return alert('映像の日付・時・分・秒と誤差を正しく入力してください。');let magnitude=h*3600+m*60+s;let o=$('offsetDirection').value==='slow'?-magnitude:magnitude;let actual=t+( $('offsetDirection').value==='slow' ? magnitude : -magnitude )*1000;let deltaDays=Math.floor(Math.abs(actual-t)/86400000);let totalSeconds=Math.floor(Math.abs(actual-t)/1000);let deltaHours=Math.floor((totalSeconds%86400)/3600),deltaMinutes=Math.floor((totalSeconds%3600)/60),deltaSecs=totalSeconds%60;let deltaLabel=(deltaDays?deltaDays+'日 ':'')+String(deltaHours).padStart(2,'0')+'時間 '+String(deltaMinutes).padStart(2,'0')+'分 '+String(deltaSecs).padStart(2,'0')+'秒';let totalHoursLabel=Math.floor(totalSeconds/3600)+'時間';$('convertResult').classList.remove('hidden');$('convertResult').innerHTML=`<div>映像に表示された時刻</div><div>${fmt(t)}</div><div>適用した誤差</div><div>${dur(o)} ${o<0?'遅れ':o>0?'進み':'誤差なし'}</div><div>誤差の合計</div><div>${deltaLabel} ${o<0?'遅れ':o>0?'進み':''}</div><div>合計時間（時間換算）</div><div>${totalHoursLabel}</div><div>換算した実際の時刻</div><div class="big">${fmt(actual)}</div>`};
-$('reverseConvertBtn').onclick=()=>{let t=stamp('reverseActual');let h=Number($('offsetHour').value),m=Number($('offsetMinute').value),sec=Number($('offsetSecond').value);if(!Number.isFinite(t)||![h,m,sec].every(Number.isFinite)||h<0||h>99||m<0||m>59||sec<0||sec>59)return alert('実際の日時と誤差を正しく入力してください。');let magnitude=h*3600+m*60+sec;let direction=$('offsetDirection').value;let offset=direction==='slow'?-magnitude:magnitude;let cameraTime=t+offset*1000;$('reverseConvertResult').classList.remove('hidden');$('reverseConvertResult').innerHTML=`<div>入力した実際の時刻</div><div>${fmt(t)}</div><div>適用した誤差</div><div>${dur(offset)} ${offset<0?'遅れ':offset>0?'進み':'誤差なし'}</div><div>算出したカメラの表示時刻</div><div class="big">${fmt(cameraTime)}</div>`;};
-$('saveCamera').onclick=()=>{let name=$('cameraName').value.trim(),address=$('cameraAddress').value.trim(),folder=$('cameraFolder').value.trim()||'未分類',o=signedOffset('manage');if(!name)return alert('カメラ名称を入力してください。');if(!Number.isFinite(o))return alert('誤差を正しく入力してください。');cameras.push({name,address,folder,offset:o});$('cameraName').value='';$('cameraAddress').value='';$('cameraFolder').value='';save();alert('カメラを保存しました。')};
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['measure','convert','manage'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab))});
-initScrollPickers();let now=new Date();['actual','camera','footage'].forEach(p=>{$(p+'Date').value=localDate(now);$(p+'Hour').value=String(now.getHours());$(p+'Minute').value=String(now.getMinutes());$(p+'Second').value=String(now.getSeconds())});['reverseActual'].forEach(p=>{$(p+'Date').value=localDate(now);$(p+'Hour').value=String(now.getHours());$(p+'Minute').value=String(now.getMinutes());$(p+'Second').value=String(now.getSeconds())});$('exportBackup').onclick=()=>{const payload={format:'bouhan-camera-backup',version:1,exportedAt:new Date().toISOString(),cameras};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='bouhan_camera_backup_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);alert('バックアップファイルを保存しました。ファイルアプリなどで保存先を確認してください。');};
-$('importBackupBtn').onclick=async()=>{const file=$('importBackup').files[0];if(!file)return alert('先にバックアップのJSONファイルを選択してください。');try{const data=JSON.parse(await file.text());const list=Array.isArray(data)?data:data.cameras;if(!Array.isArray(list)||!list.every(c=>c&&typeof c.name==='string'&&Number.isFinite(Number(c.offset))))throw new Error('形式');if(!confirm('現在のカメラ登録をバックアップ内容に置き換えます。続けますか？'))return;cameras=list.map(c=>({...c,offset:Number(c.offset),history:Array.isArray(c.history)?c.history:[]}));save();alert('バックアップを復元しました。');}catch(e){alert('バックアップファイルを読み込めませんでした。正しいJSONファイルか確認してください。');}};
-render();
-</script></body></html>
+let savedNames=readNames();
+let holidayDates=readHolidayDates();
+let editingHolidayName='';
+function readNames(){try{return JSON.parse(localStorage.getItem(NAME_STORAGE)||'[]').filter(n=>typeof n==='string')}catch(e){return []}}
+function readHolidayDates(){try{const x=JSON.parse(localStorage.getItem(HOLIDAY_STORAGE)||'{}');return x&&typeof x==='object'?x:{}}catch(e){return {}}}
+function writeHolidayDates(){try{localStorage.setItem(HOLIDAY_STORAGE,JSON.stringify(holidayDates));return true}catch(e){alert('代休の日付を保存できませんでした。端末の空き容量を確認してください。');return false}}
+
+function datesFor(name,key){return Array.isArray(holidayDates[name]?.[key])?holidayDates[name][key]:[]}
+// Japanese national holidays are calculated offline, so this works without internet.
+function jpHolidayName(dateStr){
+ const [y,m,d]=dateStr.split('-').map(Number);
+ const dt=new Date(y,m-1,d), dow=dt.getDay();
+ const nth=(month,n,weekday)=>{let first=new Date(y,month-1,1).getDay();return 1+((weekday-first+7)%7)+(n-1)*7};
+ const eqSpring=Math.floor(20.8431+0.242194*(y-1980)-Math.floor((y-1980)/4));
+ const eqAutumn=Math.floor(23.2488+0.242194*(y-1980)-Math.floor((y-1980)/4));
+ const fixed={
+  '1-1':'元日','2-11':'建国記念の日','2-23':'天皇誕生日','4-29':'昭和の日',
+  '5-3':'憲法記念日','5-4':'みどりの日','5-5':'こどもの日','8-11':'山の日',
+  '11-3':'文化の日','11-23':'勤労感謝の日'
+ };
+ if(m===1&&d===nth(1,2,1))return '成人の日';
+ if(m===7&&d===nth(7,3,1))return '海の日';
+ if(m===9&&d===nth(9,3,1))return '敬老の日';
+ if(m===10&&d===nth(10,2,1))return 'スポーツの日';
+ if(m===3&&d===eqSpring)return '春分の日';
+ if(m===9&&d===eqAutumn)return '秋分の日';
+ if(fixed[`${m}-${d}`])return fixed[`${m}-${d}`];
+ // Olympic-related one-off moves in 2020 and 2021
+ const oneOff={
+  '2020-7-23':'海の日','2020-7-24':'スポーツの日','2020-8-10':'山の日',
+  '2021-7-22':'海の日','2021-7-23':'スポーツの日','2021-8-8':'山の日'
+ };
+ if(oneOff[dateStr])return oneOff[dateStr];
+ // Citizens' holidays: weekday between two national holidays (2026 onward rules included)
+ const prev=new Date(y,m-1,d-1), next=new Date(y,m-1,d+1);
+ const key=x=>`${x.getMonth()+1}-${x.getDate()}`;
+ const isBaseHoliday=x=>{
+  const yy=x.getFullYear(), mm=x.getMonth()+1, dd=x.getDate(), ds=`${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+  if(yy===y&&ds===dateStr)return false;
+  const fixedMap={'1-1':1,'2-11':1,'2-23':1,'4-29':1,'5-3':1,'5-4':1,'5-5':1,'8-11':1,'11-3':1,'11-23':1};
+  const nn=(mo,n,w)=>{const f=new Date(yy,mo-1,1).getDay();return 1+((w-f+7)%7)+(n-1)*7};
+  const es=Math.floor(20.8431+0.242194*(yy-1980)-Math.floor((yy-1980)/4));
+  const ea=Math.floor(23.2488+0.242194*(yy-1980)-Math.floor((yy-1980)/4));
+  return !!fixedMap[`${mm}-${dd}`]||(mm===1&&dd===nn(1,2,1))||(mm===7&&dd===nn(7,3,1))||(mm===9&&dd===nn(9,3,1))||(mm===10&&dd===nn(10,2,1))||(mm===3&&dd===es)||(mm===9&&dd===ea)||!!oneOff[ds];
+ };
+ if(dow!==0&&isBaseHoliday(prev)&&isBaseHoliday(next))return '国民の休日';
+ // Substitute holiday: Sunday national holiday shifts to next non-holiday.
+ for(let back=1;back<=7;back++){
+  const prior=new Date(y,m-1,d-back);
+  if(prior.getDay()===0&&isBaseHoliday(prior)){
+   let sub=new Date(prior);
+   do{sub.setDate(sub.getDate()+1)}while(isBaseHoliday(sub)||sub.getDay()===0);
+   if(sub.getFullYear()===y&&sub.getMonth()===m-1&&sub.getDate()===d)return '振替休日';
+  }
+ }
+ return '';
+}
+function usedDatesFor(name,key){
+ const wantedType=key==='holiday'?'祝代休':'代休';
+ const used=[];
+ Object.values(records).forEach(rec=>{
+  if(!rec||!Array.isArray(rec.people))return;
+  rec.people.forEach(person=>{
+   if(person&&person.name===name&&person.type===wantedType&&person.compensatoryDate&&!used.includes(person.compensatoryDate))used.push(person.compensatoryDate);
+  });
+ });
+ return used;
+}
+function availableDatesFor(name,key){const used=usedDatesFor(name,key);return datesFor(name,key).filter(d=>!used.includes(d))}
+function addRegisteredHolidayDate(name,key,dateStr){
+ if(!name||!dateStr)return false;
+ holidayDates[name]=holidayDates[name]||{compensatory:[],holiday:[]};
+ holidayDates[name][key]=Array.isArray(holidayDates[name][key])?holidayDates[name][key]:[];
+ if(holidayDates[name][key].includes(dateStr))return false;
+ holidayDates[name][key].push(dateStr);holidayDates[name][key].sort();
+ writeHolidayDates();return true;
+}
+function autoRegisterWorkDate(person){
+ if(!person||person.type!=='日勤'||!person.name)return;
+ const [y,m,d]=currentDate.split('-').map(Number);
+ const dow=new Date(y,m-1,d).getDay();
+ if(dow===0||dow===6){
+  if(!datesFor(person.name,'compensatory').includes(currentDate)){
+   addRegisteredHolidayDate(person.name,'compensatory',currentDate);
+   markAutoHolidayDate(person.name,'compensatory',currentDate);
+  }
+ }
+ if(jpHolidayName(currentDate)){
+  if(!datesFor(person.name,'holiday').includes(currentDate)){
+   addRegisteredHolidayDate(person.name,'holiday',currentDate);
+   markAutoHolidayDate(person.name,'holiday',currentDate);
+  }
+ }
+}
+
+function writeNames(){try{localStorage.setItem(NAME_STORAGE,JSON.stringify(savedNames));renderNameRoster();return true}catch(e){alert('名前を保存できませんでした。端末の空き容量を確認してください。');return false}}
+function localDate(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function readStore(){try{return JSON.parse(localStorage.getItem(STORAGE)||'{}')}catch(e){return {}}}
+function writeStore(){try{localStorage.setItem(STORAGE,JSON.stringify(records));$('status').textContent='保存済み ✓';dirty=false;renderSavedDates();renderNameRoster();return true}catch(e){$('status').textContent='保存できません。バックアップを確認';return false}}
+function makeTimes(step=15){let a=[];for(let m=0;m<1440;m+=step)a.push(`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`);a.push('23:59');return [...new Set(a)]}
+const times=makeTimes(15);
+function blankPerson(n){return {name:`${n}人目`,workStart:'08:30',workEnd:'17:15',type:'',compensatoryDate:'',dispatch:false,dispatchPlace:'',trip:false,tripStart:'09:00',tripEnd:'17:00',overnight:false,clockIn:null,clockOut:null,remarks:''}}
+function normalize(p,i){const q={...blankPerson(i+1),...p};if(q.type==='日勤'){if(!q.workStart)q.workStart='08:30';if(!q.workEnd)q.workEnd='17:15';}else if(!q.type){q.workStart='';q.workEnd='';}return q}
+function loadDay(date){
+ currentDate=date;
+ if(records[date]&&Array.isArray(records[date].people)){
+  people=records[date].people.map(normalize);
+ }else{
+  // 新しい日付は、登録済みの名前を引き継いで勤務カードを用意する
+  people=savedNames.map((name,i)=>({...blankPerson(i+1),name}));
+ }
+ page=0;dirty=false;$('recordDate').value=date;
+ people.forEach(autoRegisterWorkDate);render();
+ $('status').textContent=records[date]?'保存済みデータを表示':'新しい日付（未保存）';
+}
+function saveDay(show=true){records[currentDate]={people:people.map(p=>({...p}))};const ok=writeStore();if(show&&ok)$('status').textContent='保存しました ✓';renderSavedDates();renderNameRoster()}
+function markDirty(){dirty=true;$('status').textContent='未保存の変更あり'}
+function timeSelect(value,field,index,label){let s=document.createElement('select');s.setAttribute('aria-label',label);let empty=document.createElement('option');empty.value='';empty.textContent='--:--';s.appendChild(empty);times.forEach(t=>{let o=document.createElement('option');o.value=t;o.textContent=t;s.appendChild(o)});s.value=value||'';s.addEventListener('change',()=>{people[index][field]=s.value;markDirty()});return s}
+function checkbox(label,key,p,index){
+ let wrap=document.createElement('div');wrap.className='checkrow';
+ [['有',true],['無',false]].forEach(([txt,val])=>{
+   let l=document.createElement('label'),c=document.createElement('input');
+   const caption=document.createElement('span');caption.textContent=txt;
+   c.type='checkbox';c.checked=(p[key]===null||p[key]===undefined)?false:(p[key]===val);c.setAttribute('aria-label',label+txt);
+   const updateEmphasis=()=>{
+     const active=((key==='overnight'||key==='trip')&&val===true&&p[key]===true)||((key==='clockIn'||key==='clockOut')&&val===false&&p[key]===false);
+     caption.style.color=active?'#d11f2f':'';
+     caption.style.fontWeight=active?'700':'';
+     c.style.accentColor=active?'#d11f2f':'';
+   };
+   updateEmphasis();
+   c.addEventListener('change',()=>{
+     if(key==='clockIn'||key==='clockOut'){
+       people[index][key]=c.checked?val:null;
+       markDirty();renderPeople();
+     }else{
+       people[index][key]=val;markDirty();renderPeople();
+     }
+   });
+   l.append(c,caption);wrap.append(l);
+ });
+ return wrap;
+}
+function field(label,content,full=false){let d=document.createElement('div');d.className='field'+(full?' full':'');let l=document.createElement('label');l.textContent=label;d.append(l,content);return d}
+function createPersonCard(p,i){
+ if(p.type==='日勤'){if(!p.workStart)p.workStart='08:30';if(!p.workEnd)p.workEnd='17:15';}
+ else if(!p.type){p.workStart='';p.workEnd='';}
+ const card=document.createElement('article');card.className='person';
+ const head=document.createElement('div');head.className='person-head';
+ const num=document.createElement('span');num.className='person-no';num.textContent=i+1;
+ const name=document.createElement('select');name.setAttribute('aria-label','氏名または識別名');
+ const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='名前を選択';name.append(placeholder);
+ const nameOptions=[...savedNames];if(p.name&&!nameOptions.includes(p.name))nameOptions.push(p.name);
+ nameOptions.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;name.append(o)});
+ name.value=p.name||'';name.addEventListener('change',()=>{people[i].name=name.value;autoRegisterWorkDate(people[i]);markDirty();render()});
+ const del=document.createElement('button');del.className='small danger';del.textContent='削除';del.addEventListener('click',()=>{if(confirm(`${p.name||`${i+1}人目`}をこの日から削除しますか？`)){people.splice(i,1);page=Math.min(page,Math.max(0,Math.ceil(people.length/4)-1));markDirty();render()}});head.append(num,name,del);card.append(head);
+ const fields=document.createElement('div');fields.className='fields';
+ const typeRow=document.createElement('div');typeRow.className='type-row';
+ const type=document.createElement('select');const blankType=document.createElement('option');blankType.value='';blankType.textContent='選択してください';type.append(blankType);TYPES.forEach(t=>{let o=document.createElement('option');o.value=t;o.textContent=t;type.append(o)});type.value=p.type||'';
+ type.addEventListener('change',()=>{
+  const previousType=people[i].type;
+  const personName=people[i].name;
+  if(previousType==='日勤'&&type.value!=='日勤'&&personName){
+   const [y,m,d]=currentDate.split('-').map(Number);
+   const dow=new Date(y,m-1,d).getDay();
+   if(dow===0||dow===6)cancelAutoHolidayDate(personName,'compensatory',currentDate);
+   if(jpHolidayName(currentDate))cancelAutoHolidayDate(personName,'holiday',currentDate);
+   people[i].compensatoryDate='';
+  }
+  people[i].type=type.value;
+  if(type.value==='日勤'){people[i].workStart='08:30';people[i].workEnd='17:15';autoRegisterWorkDate(people[i]);}
+  else{people[i].workStart='';people[i].workEnd='';}
+  markDirty();render()
+ });
+ typeRow.append(field('勤務種別',type,false));
+ const holidayKey=p.type==='祝代休'?'holiday':'compensatory';
+ const holidayLabel=p.type==='祝代休'?'祝代休発生日':'代休発生日';
+ const compDate=document.createElement('select');compDate.setAttribute('aria-label',holidayLabel);
+ const datePlaceholder=document.createElement('option');datePlaceholder.value='';datePlaceholder.textContent='日付を選択';compDate.append(datePlaceholder);
+ let registeredDates=availableDatesFor(p.name,holidayKey);
+ const existingDate=p.compensatoryDate||'';
+ if(existingDate&&!registeredDates.includes(existingDate))registeredDates=[existingDate,...registeredDates];
+ registeredDates.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;compDate.append(o)});
+ compDate.value=existingDate;
+ compDate.addEventListener('change',()=>{people[i].compensatoryDate=compDate.value;markDirty()});
+ const compDateField=field(holidayLabel,compDate,false);compDateField.hidden=!['代休','祝代休'].includes(p.type);typeRow.append(compDateField);fields.append(typeRow);
+ let work=document.createElement('div');work.className='timepair';work.append(timeSelect(p.workStart,'workStart',i,'勤務開始'),document.createTextNode('〜'),timeSelect(p.workEnd,'workEnd',i,'勤務終了'));
+ fields.append(field('勤務時間',work,true));
+ const dispatchRow=document.createElement('div');dispatchRow.className='paired-row';
+ dispatchRow.append(field('派遣',checkbox('有り','dispatch',p,i),false));
+ const dispatchPlace=document.createElement('input');dispatchPlace.type='text';dispatchPlace.placeholder='派遣場所（任意）';dispatchPlace.value=p.dispatchPlace||'';dispatchPlace.addEventListener('change',()=>{people[i].dispatchPlace=dispatchPlace.value;markDirty()});
+ const dispatchField=field('派遣場所',dispatchPlace,false);dispatchField.classList.add('conditional-detail');dispatchField.hidden=!p.dispatch;dispatchRow.append(dispatchField);fields.append(dispatchRow);
+ const tripRow=document.createElement('div');tripRow.className='paired-row';
+ tripRow.append(field('出張',checkbox('有り','trip',p,i),false));
+ const tripTimes=document.createElement('div');tripTimes.className='timepair';tripTimes.append(timeSelect(p.tripStart,'tripStart',i,'出張開始'),document.createTextNode('〜'),timeSelect(p.tripEnd,'tripEnd',i,'出張終了'));
+ const tripField=field('出張時間',tripTimes,false);tripField.classList.add('conditional-detail');tripField.hidden=!p.trip;tripRow.append(tripField);fields.append(tripRow);
+ fields.append(field('宿直',checkbox('有り','overnight',p,i),true));
+ const attendanceGroup=document.createElement('div');
+ attendanceGroup.className='attendance-group';
+ attendanceGroup.append(
+   field('出勤時打刻',checkbox('有り','clockIn',p,i),false),
+   field('退勤時打刻',checkbox('有り','clockOut',p,i),false)
+ );
+ fields.append(attendanceGroup);
+ const remarks=document.createElement('textarea');
+ remarks.className='remarks-area';remarks.placeholder='任意でコメントを入力';remarks.value=p.remarks||'';
+ remarks.setAttribute('aria-label','備考');
+ remarks.rows=2;
+ remarks.addEventListener('input',()=>{people[i].remarks=remarks.value;markDirty()});
+ fields.append(field('備考',remarks,true));
+ card.append(fields);return card;
+}
+function renderPeople(){render()}
+function render(){const root=$('people');root.replaceChildren();const pages=Math.max(1,Math.ceil(people.length/4));page=Math.max(0,Math.min(page,pages-1));const slice=people.slice(page*4,page*4+4);if(!slice.length){const e=document.createElement('div');e.className='empty';e.textContent='まだ人が登録されていません。「＋ 人を追加」から始めてください。';root.append(e)}else slice.forEach((p,j)=>root.append(createPersonCard(p,page*4+j)));$('pageLabel').textContent=`${page+1} / ${pages} ページ（全${people.length}人）`;$('prevPage').disabled=page===0;$('nextPage').disabled=page>=pages-1;$('prevPage').style.opacity=page===0?'.45':'1';$('nextPage').style.opacity=page>=pages-1?'.45':'1';renderSavedDates()}
+function renderSavedDates(){const root=$('savedDates');if(!root)return;root.replaceChildren();const dates=Object.keys(records).filter(d=>records[d]&&Array.isArray(records[d].people)).sort((a,b)=>a.localeCompare(b));if(!dates.length){const p=document.createElement('div');p.className='note';p.textContent='保存された日付はまだありません。';root.append(p);return}dates.forEach(d=>{const row=document.createElement('div');row.className='saved-entry';const label=document.createElement('div');label.className='date-label';label.textContent=d;const small=document.createElement('small');small.textContent=`${records[d].people.length}人`;const open=document.createElement('button');open.className='small';open.textContent='開く';open.addEventListener('click',()=>loadDay(d));const del=document.createElement('button');del.className='small danger';del.textContent='削除';del.addEventListener('click',()=>{if(confirm(`${d}の保存データを削除しますか？`)){delete records[d];writeStore();if(currentDate===d){people=[];page=0;render()}renderSavedDates()}});row.append(label,small,open,del);root.append(row)})}
+$('addPerson').addEventListener('click',()=>{people.push(blankPerson(people.length+1));page=Math.floor((people.length-1)/4);markDirty();render()});
+$('newDay').addEventListener('click',()=>{
+  const date=$('recordDate').value||localDate();
+  if(dirty&&!confirm('入力中の変更を破棄して、空の入力画面にしますか？\\n\\n保存済みの記録は削除されません。'))return;
+  if(!dirty&&!confirm('空の入力画面に切り替えますか？\\n\\n保存済みの記録は削除されません。'))return;
+  // Keep the saved record untouched. This is only a temporary blank editing screen.
+  currentDate=date;
+  people=[];
+  page=0;
+  dirty=true;
+  $('recordDate').value=date;
+  render();
+  $('status').textContent='新規入力画面（未保存）';
+});
+$('saveDay').addEventListener('click',()=>saveDay(true));
+$('loadDate').addEventListener('click',()=>{if(dirty&&!confirm('この日の変更はまだ保存されていません。保存せずに別の日付を開きますか？'))return;loadDay($('recordDate').value||localDate())});
+$('recordDate').addEventListener('change',()=>{});
+$('prevPage').addEventListener('click',()=>{if(page>0){page--;render()}});
+$('nextPage').addEventListener('click',()=>{if((page+1)*4<people.length){page++;render()}});
+$('exportData').addEventListener('click',()=>{const exportRecords={...records};if(dirty)exportRecords[currentDate]={people:people.map(p=>({...p}))};const blob=new Blob([JSON.stringify({app:'勤務結果記録',version:1,records:exportRecords},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`勤務結果バックアップ_${localDate()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+$('importBtn').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());const incoming=data.records||data;if(!incoming||typeof incoming!=='object')throw Error('形式');if(!confirm('バックアップを読み込みます。既存の日付と同じデータは上書きされます。続けますか？'))return;Object.keys(incoming).forEach(d=>{if(Array.isArray(incoming[d]?.people))records[d]={people:incoming[d].people.map(normalize)}});writeStore();loadDay(currentDate);alert('復元しました。')}catch(err){alert('バックアップを読み込めませんでした。JSONファイルを確認してください。')}finally{e.target.value=''}});
+function renderNameRoster(){
+ const root=$('nameRoster');if(!root)return;root.replaceChildren();
+ const summary=document.createElement('button');
+ summary.type='button';summary.className='name-count';
+ summary.textContent=savedNames.length ? `${savedNames.length}人登録済み ▾` : '登録済みの名前はありません';
+ summary.setAttribute('aria-expanded','false');
+ const list=document.createElement('div');list.className='name-list';list.hidden=true;
+ list.style.cssText='display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:6px;width:100%;margin-top:7px';
+ const editor=document.createElement('div');editor.className='holiday-editor';editor.hidden=true;
+ function renderEditor(name){
+   editor.replaceChildren();
+   if(!name){editor.hidden=true;return}
+   editor.hidden=false;
+   const title=document.createElement('h3');title.textContent=`${name}さんの代休発生日登録`;editor.append(title);
+   const makeDateSection=(key,label)=>{
+     const heading=document.createElement('div');heading.style.fontWeight='700';heading.style.marginTop='8px';heading.textContent=label;editor.append(heading);
+     const row=document.createElement('div');row.className='holiday-editor-row';
+     const input=document.createElement('input');input.type='date';input.setAttribute('aria-label',label);
+     const add=document.createElement('button');add.type='button';add.textContent='日付を登録';add.className='small';
+     add.addEventListener('click',()=>{
+       if(!input.value){alert('日付を選択してください。');return}
+       holidayDates[name]=holidayDates[name]||{compensatory:[],holiday:[]};
+       holidayDates[name][key]=Array.isArray(holidayDates[name][key])?holidayDates[name][key]:[];
+       if(!holidayDates[name][key].includes(input.value)){holidayDates[name][key].push(input.value);holidayDates[name][key].sort();writeHolidayDates()}
+       renderEditor(name);render();
+     });
+     row.append(input,add);editor.append(row);
+     const dates=datesFor(name,key),used=usedDatesFor(name,key);
+     const count=document.createElement('div');count.className='note';count.textContent=`未取得候補：${availableDatesFor(name,key).length}日 ／ 取得済み：${used.length}日`;editor.append(count);
+     if(!dates.length){const empty=document.createElement('div');empty.className='note';empty.textContent='登録された日付はありません。';editor.append(empty)}
+     dates.forEach((date,idx)=>{
+       const item=document.createElement('div');item.className='holiday-date-item';
+       const txt=document.createElement('span');txt.textContent=date+(used.includes(date)?'（取得済み）':'');
+       const del=document.createElement('button');del.type='button';del.className='name-delete';del.textContent='削除';del.style.cssText='flex-shrink:0;margin:0';
+       del.addEventListener('click',()=>{
+         if(!confirm(`${name}さんの${label}「${date}」を削除しますか？`))return;
+         holidayDates[name][key]=datesFor(name,key).filter((_,j)=>j!==idx);writeHolidayDates();renderEditor(name);render();
+       });
+       item.append(txt,del);editor.append(item);
+     });
+   };
+   makeDateSection('compensatory','代休発生日');
+   makeDateSection('holiday','祝代休発生日');
+   const close=document.createElement('button');close.type='button';close.className='secondary';close.style.marginTop='8px';close.textContent='閉じる';close.addEventListener('click',()=>{editingHolidayName='';editor.hidden=true});
+   editor.append(close);
+ }
+ savedNames.forEach((name,i)=>{
+   const item=document.createElement('div');item.className='name-list-item';
+   item.style.cssText='display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;width:100%;box-sizing:border-box;padding:7px 8px;border:1px solid #d5dfe7;border-radius:7px;background:#f4f7fa';
+   const label=document.createElement('span');label.className='name-list-label';
+   const compCount=availableDatesFor(name,'compensatory').length;
+   const holidayCount=availableDatesFor(name,'holiday').length;
+   label.textContent=`${i+1}. ${name}（代休残${compCount}・祝代休残${holidayCount}）`;label.title='クリックして代休の日付を登録・残数を確認';
+   label.style.cssText='display:block;flex:1;min-width:0;overflow-wrap:anywhere;cursor:pointer;text-decoration:underline;text-underline-offset:2px';
+   label.addEventListener('click',()=>{editingHolidayName=name;renderEditor(name)});
+   const del=document.createElement('button');del.type='button';del.className='name-delete';del.textContent='削除';
+   del.addEventListener('click',()=>{
+     if(!confirm(`登録名「${name}」を削除しますか？\n勤務記録にすでに入力された名前は、その記録には残ります。`))return;
+     savedNames=savedNames.filter((_,idx)=>idx!==i);
+     writeNames();renderNameRoster();render();
+   });
+   item.append(label,del);list.append(item);
+ });
+ summary.addEventListener('click',()=>{
+   list.hidden=!list.hidden;
+   summary.setAttribute('aria-expanded',String(!list.hidden));
+   summary.textContent=savedNames.length ? `${savedNames.length}人登録済み ${list.hidden?'▾':'▴'}` : '登録済みの名前はありません';
+ });
+ root.append(summary,list,editor);
+ if(editingHolidayName&&savedNames.includes(editingHolidayName))renderEditor(editingHolidayName);
+}
+$('registerName').addEventListener('click',()=>{
+ const input=$('newName');const name=input.value.trim();
+ if(!name){alert('登録する名前を入力してください。');input.focus();return;}
+ if(savedNames.includes(name)){alert('その名前は登録済みです。');return;}
+ savedNames.push(name);
+ if(!writeNames())return;
+ input.value='';$('status').textContent='名前を登録しました ✓';render();
+});
+$('newName').addEventListener('keydown',e=>{if(e.key==='Enter')$('registerName').click()});
+// 起動時は「新規作成」ボタンを押した直後と同じ、空の入力画面から始める。保存済みデータは変更しない。
+currentDate=localDate();
+people=[];
+page=0;dirty=false;$('recordDate').value=currentDate;render();
+$('status').textContent='新規入力画面（未保存）';
+renderNameRoster();
+})();
+</script>
+</body>
+</html>
